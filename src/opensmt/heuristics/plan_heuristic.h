@@ -30,6 +30,8 @@ along with dReal. If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include <string>
 #include <utility>
+#include "colin/FFSolver.h"
+
 
 namespace dreal {
 class plan_heuristic : public heuristic {
@@ -53,13 +55,26 @@ public:
 
 
 private:
+
+    // Colin related data and methods
+    set<int> goals;
+    set<int> numericGoals;
+
+    
+
+    Planner::ExtendedMinimalState* populateStateFromStack(vector<double>& tinitialFluents,Planner::LiteralSet& tinitialState);  
+    int getColinHeuristic();
+    
+
+    // search related data and methods
     void pushTrailOnStack();
     void completeSuggestionsForTrail();
     int getChoiceIndex(Enode*);
     bool expand_path();
     bool unwind_path();
     bool pbacktrack();
-    
+
+
     vector<string> m_actions;
     vector<string> m_events;
     vector<string> m_processes;

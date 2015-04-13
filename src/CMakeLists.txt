@@ -20,8 +20,8 @@ include(CTest)
 # Added for External Projects
 include(ExternalProject)
 
-set(DREAL_EXTRA_LINKER_FLAGS "-D__USE_FILIB__")
-set(DREAL_EXTRA_CXX_FLAGS "-D__USE_FILIB__")
+set(DREAL_EXTRA_LINKER_FLAGS "-D__USE_FILIB__ -DTOTALORDERSTATES -DPOPF3ANALYSIS")
+set(DREAL_EXTRA_CXX_FLAGS "-D__USE_FILIB__ -DTOTALORDERSTATES -DPOPF3ANALYSIS")
 
 ################################################################
 # Set Module Path
@@ -109,6 +109,68 @@ SET(CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
   ${CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES}
   /usr/lib64 /usr/lib32 /usr/lib /lib
   )
+
+set(DREAL_LIBS ${DREAL_LIBS}  "colin")
+include_directories(${DREAL_SOURCE_DIR}/colin)
+include_directories(${DREAL_SOURCE_DIR}/colin/val)
+add_custom_target(colin_copy)
+   add_custom_command(
+    TARGET colin_copy PRE_BUILD
+    COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libcolin.a
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libcolin.a
+    COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libColinCommon.a
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libColinCommon.a
+   COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libCgl.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libCgl.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libOsiClp.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libOsiClp.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libOsi.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libOsi.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libCbc.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libCbc.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libCbcSolver.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libCbcSolver.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libClp.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libClp.dylib
+ COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/libCoinUtils.dylib
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libCoinUtils.dylib
+
+
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/colin/libcolin.a
+   )
+
+set(DREAL_LIBS ${DREAL_LIBS}  "Inst")
+set(DREAL_LIBS ${DREAL_LIBS}  "ParsePDDL")
+set(DREAL_LIBS ${DREAL_LIBS}  "Cgl")
+set(DREAL_LIBS ${DREAL_LIBS}  "OsiClp")
+set(DREAL_LIBS ${DREAL_LIBS}  "Osi")
+set(DREAL_LIBS ${DREAL_LIBS}  "Cbc")
+set(DREAL_LIBS ${DREAL_LIBS}  "CbcSolver")
+set(DREAL_LIBS ${DREAL_LIBS}  "Clp")
+set(DREAL_LIBS ${DREAL_LIBS}  "CoinUtils")
+set(DREAL_LIBS ${DREAL_LIBS}  "ColinCommon")
+
+ add_custom_target(val_copy)
+   add_custom_command(
+     TARGET val_copy PRE_BUILD
+     COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libInst.a
+     ${CMAKE_CURRENT_BINARY_DIR}/lib/libInst.a
+     COMMAND ${CMAKE_COMMAND}
+     -E copy ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libParsePDDL.a ${CMAKE_CURRENT_BINARY_DIR}/lib/libParsePDDL.a
+     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libInst.a ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libParsePDDL.a
+   )
+
+
 
 ################################################################
 # Packages
@@ -319,7 +381,7 @@ add_subdirectory(dsolvers)
 set(DREAL_LIBS ${DREAL_LIBS} dsolvers)
 add_subdirectory(realpaver)
 set(DREAL_LIBS ${DREAL_LIBS} realpaver)
-add_subdirectory(util)
+add_subdirectory(util) 
 set(DREAL_LIBS ${DREAL_LIBS} util)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${DREAL_EXTRA_LINKER_FLAGS} ${EXTERNAL_LD_FLAGS}")
@@ -328,6 +390,7 @@ set(CMAKE_EXE_LINKER_FLAGS_TESTCOV "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ft
 set(EXTRA_LIBS ${DREAL_LIBS} ${EXTRA_LIBS})
 add_executable(dReal main.cpp)
 target_link_libraries(dReal ${EXTRA_LIBS})
+
 
 #add tests
 add_subdirectory(tests/nra)
@@ -345,6 +408,8 @@ add_dependencies(realpaver GFLAGS)
 add_dependencies(realpaver CAPD4)
 add_dependencies(realpaver FILIBXX)
 add_dependencies(realpaver util)
+add_dependencies(dReal colin_copy)
+add_dependencies(dReal val_copy)
 
 # Include style check
 include(StyleCheck)
