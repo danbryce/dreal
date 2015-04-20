@@ -181,7 +181,7 @@ void hybrid_heuristic::inform(Enode * e){
 	  int time_pos = var.rfind("_")+1;
 	  int time = atoi(var.substr(time_pos).c_str());
 	  int autom = (predecessors.size() == 1 ? 
-		       1 : 
+		       0 : 
 		       atoi(var.substr(autom_pos, time_pos-1).c_str()));
 	  int mode = get_mode(e);
 
@@ -241,16 +241,12 @@ void hybrid_heuristic::inform(Enode * e){
     displayTrail();
     displayStack();
 
-    int bt_point = (trail_lim->size() == 0 ? 
-		    0 : (m_stack_lim.size() <= trail_lim->size() ? 
-			 m_stack.size() : 
-			  m_stack_lim[trail_lim->size()]-1));
+    int bt_point = (trail_lim->size() == 0 ? 0 : (m_stack_lim.size() == trail_lim->size() ? m_stack.size() : m_stack_lim[trail_lim->size()]-1));
     DREAL_LOG_DEBUG << "level = " << trail_lim->size() << " pt = " << bt_point;
 
-    while(m_stack_lim.size() > trail_lim->size() && !m_stack_lim.empty()) 
-      m_stack_lim.pop_back();
+    while(m_stack_lim.size() != trail_lim->size()) m_stack_lim.pop_back();
 
-    for (int i = m_stack.size(); i > bt_point+1; i--){
+    for (int i = m_stack.size(); i > bt_point; i--){
       std::pair<Enode *, bool> *s = m_stack.back();
       m_stack.pop_back();
       stack_literals.erase(s->first);
@@ -301,7 +297,20 @@ bool hybrid_heuristic::expand_path(){
         DREAL_LOG_INFO << "Adding decision at time " << time  << " to reach " << parent << " in a" << autom;
 
         set<int> * preds = (*predecessors[autom])[parent-1];
-        current_decision->insert(current_decision->begin(), preds->begin(), preds->end());
+
+	if (time == 0){
+	  //intersect initial state with current_decision
+	  int init_mode = m_init_mode[autom];
+	  
+	  if (preds->find(init_mode) == preds->end()){
+            DREAL_LOG_INFO << "No decisions left at time " << time << endl;
+            return false;
+	  }
+	  current_decision->insert(current_decision->begin(), init_mode);
+	} else {
+	  current_decision->insert(current_decision->begin(), preds->begin(), preds->end());
+	}
+
 
         set<int> current_decision_copy (current_decision->begin(), current_decision->end());
         // prune out choices that are negated in m_stack
@@ -558,10 +567,12 @@ bool hybrid_heuristic::unwind_path() {
     }
 
     DREAL_LOG_DEBUG << "After BT stack:";
-    int i = 0;
-    for (std::size_t time = (m_depth+1)*num_autom ; 
-	 time > (m_depth+1)-m_decision_stack.size(); time--) {
-      DREAL_LOG_DEBUG << "Stack(" << time << ") =" << m_decision_stack[i++]->second->back();
+    //    int i = 0;
+    for (int i = 0; i < m_decision_stack.size(); i++){
+
+// std::size_t time = (m_depth+1)*num_autom ; 
+// 	 time > (m_depth+1)-m_decision_stack.size(); time--) {
+      DREAL_LOG_DEBUG << "Stack[" << i << "] =" << m_decision_stack[i]->second->back();
     }
     return m_decision_stack.size() > 0;
   }

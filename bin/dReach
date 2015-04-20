@@ -7,7 +7,7 @@ SCRIPT_PATH="$( cd "$( dirname "${SCRIPT_PATHNAME}" )" && pwd )"
 # TODO: Specify the paths for BMC tool and DREAL
 for BMC_NAME in bmc bmc_main.native; do
     BMC=${SCRIPT_PATH}/${BMC_NAME}
-    if [ -e ${BMC} ] ; then 
+    if [ -e ${BMC} ] ; then
         break
     fi
 done
@@ -23,8 +23,6 @@ usage: $0 options <*.drh> <options to dReal>
 
 dReach: Bounded Model Checking for for Nonlinear Hybrid Systems
 
-
-
 OPTIONS:
 
    -k <N> / -u <N>  specify the upperbound of unrolling steps (default: 3)
@@ -39,10 +37,12 @@ OPTIONS:
 
    -d               disjunctive path encoding (default: do not use)
 
-   -z               apply exit codes (default: do not use): 
-                                51 if SAT, 
+   -z               apply exit codes (default: do not use):
+                                51 if SAT,
                                 52 if UNSAT,
                                 1 abnormal termination
+
+   -o               parse old .drh file format (default: do not use)
 
 EXAMPLE:
 
@@ -60,8 +60,9 @@ L=0
 U=NONE
 DEFAULT_U=3
 Z_OPT=FALSE #(edited: FS)
+OLD=""
 
-while getopts "zhbdk:l:u:ep:ir" OPTION
+while getopts "zohbdk:l:u:ep:ir" OPTION
 do
     case $OPTION in
         h)
@@ -92,6 +93,9 @@ do
         z)                  #(edited: FS)
             Z_OPT=TRUE      #
             ;;              #
+        o)
+            OLD=" --old_format"
+            ;;
         \?)
             usage
             exit 1
@@ -153,6 +157,7 @@ fi
 BASE=${1%.drh}
 DRH=$BASE.drh
 PDRH=$BASE.preprocessed.drh
+PATH_FILE=$BASE.paths
 
 # Extract dReal Options
 shift 1
@@ -161,6 +166,9 @@ echo dReal Options: $SOLVER_OPT
 
 # Preprocessing
 sed "s/\/\/.*//g" $DRH | cpp -P -w > $PDRH
+
+# Append option to parse old file format
+BMC=$BMC$OLD
 
 UNROLLS=`seq $L $U`
 for K in $UNROLLS
@@ -175,7 +183,7 @@ do
         if [ $BMCH -eq 1 ]
         then
             # Construct Heuristic function
-            echo $BMC -k $K --bmc_heuristic ${HEURISTIC} $PDRH 
+            #echo $BMC -k $K --bmc_heuristic ${HEURISTIC} $PDRH 
             $BMC -k $K --bmc_heuristic ${HEURISTIC} $PDRH > ${SMT}
             SOLVER_OPT="${SOLVER_OPT} --bmc_heuristic ${HEURISTIC}"
         elif [ $BMCH -lt 3 ]
@@ -202,7 +210,8 @@ do
         #echo SMT: ${SMT}
 
         #Solve
-        ${SOLVER} ${SOLVER_OPT} ${SMT} --short_sat --delta_heuristic --delta --time_split_heuristic 2>&1 | tee $OUT
+        echo "${SOLVER} ${SOLVER_OPT} ${SMT} --short_sat --delta_heuristic --delta --time_split_heuristic 2>&1 | tee $OUT"
+        ${SOLVER} ${SOLVER_OPT} ${SMT} --short_sat --delta_heuristic --delta 2>&1 | tee $OUT
         RESULT=`tail -n 1 $OUT`
         if [[ $RESULT == "sat" ]]
         then
@@ -219,10 +228,13 @@ do
     else
         # Enumerate all paths and call dReal with options
         PATH_NUM=0
-        PATHS=`$BMC -k $K --pathgen $PDRH`
-        if [[ $PATHS ]] ; then
-            for P in $PATHS
+        $BMC -k $K --pathgen $PDRH > ${PATH_FILE}
+        if [[ -s ${PATH_FILE} ]] ; then
+            while read P
             do
+                if [ -z "${P}" ]; then
+                    continue;
+                fi
                 SMT=${BASE}_${K}_${PATH_NUM}.smt2
                 OUT=${BASE}_${K}_${PATH_NUM}.output
                 ERR=${BASE}.err
@@ -230,7 +242,7 @@ do
                 echo SMT: ${SMT}, PATH : $P
                 if [ $Z_OPT == TRUE ];                                          # (edited: FS)
                 then                                                            #
-                    ${SOLVER} ${SOLVER_OPT} ${SMT} --short_sat 2>$ERR 1>$OUT    #
+                    ${SOLVER} ${SOLVER_OPT} --short_sat ${SMT} 2>$ERR 1>$OUT    #
                     if [ $? == 0 ];                                             #
                     then                                                        #
                         rm $ERR                                                 #
@@ -242,8 +254,8 @@ do
                         rm $PDRH                                                #
                         exit 1                                                  #
                     fi                                                          #
-                else                                                            
-                    ${SOLVER} ${SOLVER_OPT} ${SMT} --short_sat 2>&1 | tee $OUT
+                else
+                    ${SOLVER} ${SOLVER_OPT} --short_sat ${SMT} 2>&1 | tee $OUT
                 fi
                 RESULT=`tail -n 1 $OUT`
                 if [[ $RESULT == "sat" ]]
@@ -263,7 +275,7 @@ do
                     rm $OUT                 #
                 fi                          #
                 PATH_NUM=$((${PATH_NUM} + 1))
-            done
+            done < ${PATH_FILE}
             echo "For k = $K, dReach tried ${PATH_NUM} feasible paths, all of them are unsat."
         else
             echo "For k = $K, there is no feasible path to check."
