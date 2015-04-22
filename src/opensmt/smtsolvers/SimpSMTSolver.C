@@ -136,9 +136,7 @@ void SimpSMTSolver::initialize( )
 
   theory_handler = new THandler( egraph, config, *this, trail, level, assigns, var_True, var_False );
 
-  heuristic->initialize(config, egraph, theory_handler, &trail, &trail_lim);
-
-
+  heuristic.initialize(config, egraph, theory_handler, &trail, &trail_lim);
 }
 
 Var SimpSMTSolver::newVar(bool sign, bool dvar)
@@ -502,8 +500,7 @@ bool SimpSMTSolver::addSMTClause( vector< Enode * > & smt_clause, uint64_t in )
     // Just add the literal
     //
     Lit l = theory_handler->enodeToLit( e );
-    heuristic->inform(e);
-
+    heuristic.inform(e);    
 #if NEW_SIMPLIFICATIONS
     if ( e->isTAtom( ) )
     {

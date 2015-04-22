@@ -3,7 +3,7 @@ Author: Soonho Kong <soonhok@cs.cmu.edu>
         Sicun Gao <sicung@cs.cmu.edu>
         Edmund Clarke <emc@cs.cmu.edu>
 
-dReal -- Copyright (C) 2013 - 2014, Soonho Kong, Sicun Gao, and Edmund Clarke
+dReal -- Copyright (C) 2013 - 2015, Soonho Kong, Sicun Gao, and Edmund Clarke
 
 dReal is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@ along with dReal. If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
 #pragma once
+#include <functional>
+#include <set>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -38,12 +41,13 @@ public:
     ~nra_solver();
     lbool inform(Enode * e);
     bool  assertLit(Enode * e, bool = false);
-    void  pushBacktrackPoint ();
-    void  popBacktrackPoint ();
+    void  pushBacktrackPoint();
+    void  popBacktrackPoint();
     bool  check(bool c);
     bool  belongsToT(Enode * e);
     void  computeModel();
     int   decisions() { return m_decisions; }
+
 private:
     // fields
     scoped_env m_env;
@@ -51,4 +55,4 @@ private:
     scoped_vec m_explanation_stack;
     int        m_decisions;
 };
-}
+}  // namespace dreal

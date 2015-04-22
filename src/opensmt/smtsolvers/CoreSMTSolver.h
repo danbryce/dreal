@@ -44,6 +44,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "smtsolvers/SMTSolver.h"
 
 #include <cstdio>
+#include <sstream>
 
 #include "minisat/mtl/Vec.h"
 #include "minisat/mtl/Heap.h"
@@ -101,6 +102,7 @@ public:
         //
         lbool   value      (Var x) const;       // The current value of a variable.
         lbool   value      (Lit p) const;       // The current value of a literal.
+        lbool   modelValue (Var x) const;       // The value of a variable in the last model. The last call to solve must have been satisfiable.
         lbool   modelValue (Lit p) const;       // The value of a literal in the last model. The last call to solve must have been satisfiable.
         int     nAssigns   ()      const;       // The current number of assigned literals.
         int     nClauses   ()      const;       // The current number of original clauses.
@@ -346,6 +348,7 @@ protected:
         int    restartNextLimit       ( int );         // Next conflict limit for restart
         Var    generateMoreEij        ( );             // Generate more eij
         Var    generateNextEij        ( );             // Generate next eij
+        bool   entailment             ( );             // Check if a partial assignment entails a formula
 
 #ifndef SMTCOMP
         void   dumpCNF                ( );             // Dumps CNF to cnf.smt2
@@ -515,6 +518,7 @@ inline int      CoreSMTSolver::decisionLevel ()      const                { retu
 inline uint32_t CoreSMTSolver::abstractLevel (Var x) const                { return 1 << (level[x] & 31); }
 inline lbool    CoreSMTSolver::value         (Var x) const                { return toLbool(assigns[x]); }
 inline lbool    CoreSMTSolver::value         (Lit p) const                { return toLbool(assigns[var(p)]) ^ sign(p); }
+inline lbool    CoreSMTSolver::modelValue    (Var x) const                { return model[x]; }
 inline lbool    CoreSMTSolver::modelValue    (Lit p) const                { return model[var(p)] ^ sign(p); }
 inline int      CoreSMTSolver::nAssigns      ()      const                { return trail.size(); }
 inline int      CoreSMTSolver::nClauses      ()      const                { return clauses.size(); }
