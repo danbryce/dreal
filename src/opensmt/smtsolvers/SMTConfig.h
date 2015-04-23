@@ -212,6 +212,9 @@ struct SMTConfig
   bool         nra_ODE_parallel;              // solve ODE in parallel or not
   bool         nra_output_num_nodes;          // output number of SAT and ICP nodes to stdout
 
+  void inc_icp_decisions() { nra_icp_decisions++; }
+  int  icp_decisions() { return nra_icp_decisions; }
+
 private:
 
   ofstream     stats_out;                    // File for statistics

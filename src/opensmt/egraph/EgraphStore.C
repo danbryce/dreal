@@ -903,6 +903,9 @@ Enode * Egraph::mkSqrt            ( Enode * args)
 {
   assert( args );
   assert( args->getArity( ) == 1 );
+  if ( !args || args->getArity() != 1) {
+      return nullptr;
+  }
   Enode * res = cons( id_to_enode[ ENODE_ID_SQRT], args );
   assert( res );
   return res;
@@ -912,6 +915,9 @@ Enode * Egraph::mkSafeSqrt            ( Enode * args)
 {
   assert( args );
   assert( args->getArity( ) == 1 );
+  if ( !args || args->getArity() != 1) {
+      return nullptr;
+  }
   Enode * res = cons( id_to_enode[ ENODE_ID_SAFESQRT], args );
   assert( res );
   return res;
