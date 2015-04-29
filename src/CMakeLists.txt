@@ -110,6 +110,7 @@ SET(CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
   /usr/lib64 /usr/lib32 /usr/lib /lib
   )
 
+if(WITH_COLIN)
 set(DREAL_LIBS ${DREAL_LIBS}  "colin")
 include_directories(${DREAL_SOURCE_DIR}/colin)
 include_directories(${DREAL_SOURCE_DIR}/colin/val)
@@ -170,7 +171,7 @@ set(DREAL_LIBS ${DREAL_LIBS}  "ColinCommon")
      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libInst.a ${CMAKE_CURRENT_SOURCE_DIR}/colin/val/libParsePDDL.a
    )
 
-
+endif(WITH_COLIN)
 
 ################################################################
 # Packages
@@ -408,8 +409,11 @@ add_dependencies(realpaver GFLAGS)
 add_dependencies(realpaver CAPD4)
 add_dependencies(realpaver FILIBXX)
 add_dependencies(realpaver util)
+
+if(WITH_COLIN)
 add_dependencies(dReal colin_copy)
 add_dependencies(dReal val_copy)
+endif(WITH_COLIN)
 
 # Include style check
 include(StyleCheck)

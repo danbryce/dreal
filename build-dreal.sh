@@ -58,6 +58,6 @@ if [ ! -d build ]; then
     mkdir build
 fi
 cd build
-cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC -DCMAKE_BUILD_TYPE=RELEASE ../src
+cmake -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC -DCMAKE_BUILD_TYPE=RELEASE -DWITH_COLIN=FALSE ../src
 make -j
 cd ../
