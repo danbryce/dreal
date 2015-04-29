@@ -119,7 +119,9 @@ let preprocess (vm, cm, mm, iid, iformula, gs, ginvs, n, nid, ll) : t =
                 Jump.target j,
                 Basic.preprocess_formula subst (Jump.change j),
                 Jump.label j))
-            (Mode.jumpmap m)
+            (Mode.jumpmap m),
+            
+            0
          )
          end
       )
