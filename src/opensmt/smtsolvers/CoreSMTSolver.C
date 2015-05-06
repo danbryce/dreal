@@ -590,7 +590,7 @@ void CoreSMTSolver::cancelUntilVarTempDone( )
     vec< Lit > conflicting;
     int        max_decision_level;
     theory_handler->getConflict( conflicting, max_decision_level );
-  } 
+  }
 }
 
 //=================================================================================================
@@ -642,9 +642,9 @@ Lit CoreSMTSolver::pickBranchLit(int polarity_mode, double random_var_freq)
       Lit sugg = heuristic->getSuggestion( );
       if(var(sugg) != var_Undef){
         DREAL_LOG_DEBUG << "CoreSMTSolver::pickBranchLit() Heuristic Suggested Decision: "
-			<< sign(sugg) << " " << theory_handler->varToEnode(var(sugg))
-			<< " activity = " << activity[var(sugg)]
-			<< endl;
+                        << sign(sugg) << " " << theory_handler->varToEnode(var(sugg))
+                        << " activity = " << activity[var(sugg)]
+                        << endl;
       }
       else{
         DREAL_LOG_DEBUG << "CoreSMTSolver::pickBranchLit() Heuristic Suggested Decision: var_Undef" << endl;
@@ -690,7 +690,7 @@ Lit CoreSMTSolver::pickBranchLit(int polarity_mode, double random_var_freq)
       if(next != var_Undef){
         DREAL_LOG_DEBUG << "CoreSMTSolver::pickBranchLit() Activity Decision: "
                         << sign << " " << theory_handler->varToEnode(next)
-			<< " activity = " << activity[next]
+                        << " activity = " << activity[next]
                         << endl;
       }
                  return next == var_Undef ? lit_Undef : Lit(next, sign);
@@ -1800,15 +1800,13 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
             }
           }
 
-	  //Filter variables that don't need assignment
-	  filterUnassigned();
+          //Filter variables that don't need assignment
+          filterUnassigned();
 
           if( isSAT ){
             DREAL_LOG_DEBUG << "CoreSMTSolver::search() Found Model after # decisions " << decisions << endl;
-            //first_model_found = true;
             next = lit_Undef;
-          }
-          else{
+          } else {
             DREAL_LOG_DEBUG << "CoreSMTSolver::search() not SAT yet" << endl;
           }
 	  
@@ -1893,12 +1891,12 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
             // Model found:
             DREAL_LOG_DEBUG << "CoreSMTSolver::search() Found Model after # decisions "
                             << decisions << endl;
-	    if(DREAL_LOG_DEBUG_IS_ON){
-	      DREAL_LOG_DEBUG << "Model is:";
-	      printCurrentAssignment(std::cout);
-	    }
+            if(DREAL_LOG_DEBUG_IS_ON){
+              DREAL_LOG_DEBUG << "Model is:";
+              printCurrentAssignment(std::cout);
+            }
             return l_True;
-	  }
+          }
         }
 
         // Increase decision level and enqueue 'next'
