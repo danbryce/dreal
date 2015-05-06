@@ -346,7 +346,7 @@ void Enode::print_infix(ostream & os, lbool polarity, string const & variable_po
             os << setprecision(16) << std::fixed << "(" << r << ")";
         } else {
             // Fixed Notation
-	  os << "(" << name << ")";
+          os << "(" << name << ")";
         }
     } else if (isTerm()) {
         // output "("
