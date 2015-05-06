@@ -422,12 +422,12 @@ void plan_heuristic::inform(Enode * e) {
     displayStack();
 
     int bt_point = (trail_lim->size() == 0 ? 
-		    0 : (m_stack_lim.size() <= trail_lim->size() ? 
+		    0 : (m_stack_lim.size() <= (unsigned int) trail_lim->size() ? 
 			 m_stack.size() : 
 			  m_stack_lim[trail_lim->size()]-1));
     DREAL_LOG_DEBUG << "level = " << trail_lim->size() << " pt = " << bt_point;
 
-    while(m_stack_lim.size() > trail_lim->size() && !m_stack_lim.empty()) 
+    while(m_stack_lim.size() > (unsigned int) trail_lim->size() && !m_stack_lim.empty()) 
       m_stack_lim.pop_back();
 
     for (int i = m_stack.size(); i > bt_point+1; i--) {
@@ -464,7 +464,7 @@ void plan_heuristic::inform(Enode * e) {
   void plan_heuristic::pushTrailOnStack() {
     DREAL_LOG_INFO << "plan_heuristic::pushTrailOnStack() lastTrailEnd = "
                    << lastTrailEnd << " trail->size() = " << trail->size();
-    if(trail_lim->size() > m_stack_lim.size() ) //track start of levels after the first level
+    if((unsigned int) trail_lim->size() > m_stack_lim.size() ) //track start of levels after the first level
       m_stack_lim.push_back(m_stack.size());
 
     for (int i = lastTrailEnd; i < trail->size(); i++) {
@@ -496,8 +496,8 @@ void plan_heuristic::inform(Enode * e) {
     displayStack();
   }
 
-  void plan_heuristic::completeSuggestionsForTrail(){
-    for(int i = m_decision_stack.size()-1; i < m_decision_stack.size(); i++){
+  void plan_heuristic::completeSuggestionsForTrail() {
+    for(unsigned int i = 0; i < m_decision_stack.size(); i++) {
       pair<Enode*, vector<bool>*>* decision = m_decision_stack[i];
       if(decision->first != NULL) {
 	m_suggestions.push_back(new std::pair<Enode *, bool>(decision->first, decision->second->back()));
@@ -599,22 +599,29 @@ bool plan_heuristic::expand_path() {
 
 	//      vector<bool> current_decision_copy (current_decision->begin(), current_decision->end());
         // prune out choices that are negated in m_stack
-      for (auto e : m_stack) {
-	if(e->first == current_enode){
-	  current_decision->push_back(e->second);
-	  found_existing_value = true;
-	  break;
-	}	
-      }
-      if(!found_existing_value){
-	double before_decision_value = 0;
-	double after_decision_value = 0;
-#ifdef WITH_COLIN
-	before_decision_value = getColinHeuristic(-1); //value if do nothing
-	after_decision_value = getColinHeuristic(choice); //value if do choice
-#endif
-	if(before_decision_value <= after_decision_value){
-	  // adding this action does not improve heuristic value
+        for (auto e : m_stack) {
+	  if(e->first == current_enode) {
+	    current_decision->push_back(e->second);
+	    found_existing_value = true;
+	    break;
+	  }
+	  
+	  // if (e->second != true) {
+          //       //      DREAL_LOG_INFO << "Checking removal of " << e << endl;
+	  //     auto p = (*mode_literals[autom]).find(e->first);
+	  //     if (p != (*mode_literals[autom]).end()) {
+          //           // DREAL_LOG_INFO << "Removing negated " << p->second->first << endl;
+          //           if (p->second->second == time) {
+          //               DREAL_LOG_INFO << "Removing negated " << p->second->first << endl;
+          //               auto e1 = current_decision_copy.find(p->second->first);
+          //               if (e1 != current_decision_copy.end()) {
+          //                   current_decision_copy.erase(e1);
+          //               }
+          //           }
+          //       }
+          //   }
+        }
+	if(!found_existing_value) {
 	  current_decision->push_back(false);
 	  current_decision->push_back(true);
 	} else {
