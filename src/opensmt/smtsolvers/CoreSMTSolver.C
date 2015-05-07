@@ -117,8 +117,6 @@ CoreSMTSolver::CoreSMTSolver( Egraph & e, SMTConfig & c )
     heuristic = new dreal::heuristic();
   } 
 
-
-
 }
 
 void
@@ -437,7 +435,7 @@ void CoreSMTSolver::cancelUntil(int level)
     if ( first_model_found ) {
       theory_handler->backtrack( );
     }
-    heuristic->backtrack();      
+    heuristic->backtrack();
   }
 }
 
@@ -501,7 +499,7 @@ void CoreSMTSolver::addNewAtom( Enode * e )
   // Automatically adds new variable for e
   //Lit l = theory_handler->enodeToLit( e );
   theory_handler->enodeToLit( e );
-  heuristic.inform(e);
+  heuristic->inform(e);
 }
 
 void CoreSMTSolver::cancelUntilVar( Var v )
@@ -535,7 +533,7 @@ void CoreSMTSolver::cancelUntilVar( Var v )
   }
 
   theory_handler->backtrack( );
-  heuristic.backtrack();
+  heuristic->backtrack();
 }
 
 void CoreSMTSolver::cancelUntilVarTempInit( Var v )
@@ -564,7 +562,7 @@ void CoreSMTSolver::cancelUntilVarTempInit( Var v )
 
   trail.shrink(trail.size( ) - c );
   theory_handler->backtrack( );
-  heuristic.backtrack();
+  heuristic->backtrack();
 }
 
 void CoreSMTSolver::cancelUntilVarTempDone( )
@@ -1815,6 +1813,10 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 	    printCurrentAssignment(std::cout);
 	  }
 
+          if(DREAL_LOG_DEBUG_IS_ON){
+            DREAL_LOG_DEBUG << "Model is:";
+            printCurrentAssignment(std::cout);
+          }
         }
 
         if (next == lit_Undef){
@@ -2057,7 +2059,7 @@ lbool CoreSMTSolver::solve( const vec<Lit> & assumps
     cancelUntil(-1);
     if ( first_model_found ) {
       theory_handler->backtrack( );
-      heuristic.backtrack();
+      heuristic->backtrack();
     }
   }
   else
