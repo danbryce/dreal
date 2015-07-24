@@ -638,6 +638,11 @@ Lit CoreSMTSolver::pickBranchLit(int polarity_mode, double random_var_freq)
     for( ;; )
     {
       Lit sugg = heuristic->getSuggestion( );
+      if(sugg == lit_Error){
+	DREAL_LOG_DEBUG << "CoreSMTSolver::pickBranchLit() Heuristic determined UNSAT!" << endl;
+	return sugg;
+      }
+      
       if(var(sugg) != var_Undef){
         DREAL_LOG_DEBUG << "CoreSMTSolver::pickBranchLit() Heuristic Suggested Decision: "
                         << sign(sugg) << " " << theory_handler->varToEnode(var(sugg))
@@ -1841,6 +1846,11 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 	    }
         	}
 
+	  if ( next == lit_Error )
+	    {
+	      return l_False;
+	    }
+	  
           // Complete Call
           if ( next == lit_Undef )
           {
