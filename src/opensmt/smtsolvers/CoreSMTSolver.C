@@ -1680,6 +1680,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
     //DREAL_LOG_DEBUG << "CoreSMTSolver::propagate()" << endl;
     Clause* confl = propagate();
     if (confl != NULL){
+      DREAL_LOG_DEBUG << "Found conflict";
       // CONFLICT
       DREAL_LOG_DEBUG << "CoreSMTSolver::search() Conflict from propagate(): " << confl << endl;
       conflicts++; conflictC++;
@@ -1851,6 +1852,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 	      //	      return l_False;
 	      Clause* confl = heuristic->getConflict( );
 	      if (confl != NULL){
+		DREAL_LOG_DEBUG << "Analyze Conflict";
 		// CONFLICT
 		conflicts++; conflictC++;
 		if (decisionLevel() == 0)
@@ -1893,6 +1895,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 		
 		varDecayActivity();
 		claDecayActivity();
+		DREAL_LOG_DEBUG << "Done Analyze Conflict";
 		
 	      }
 	      continue;
