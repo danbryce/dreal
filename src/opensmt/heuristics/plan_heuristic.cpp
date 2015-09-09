@@ -635,12 +635,12 @@ bool plan_heuristic::expand_path() {
 	DREAL_LOG_INFO << "No decisions left at time " << time << endl;
 	return false;
       }
-      }
+    
       m_decision_stack.push_back(new pair<Enode*, vector<bool>*>(current_enode, current_decision));
-
+    
     }
 
-    return found_step || no_steps_left;
+  return (found_step || no_steps_left);
       // static_cast<int>(m_decision_stack.size()) ==
       // num_choices_per_happening*(m_depth); // successfully found a full path
 }
@@ -875,9 +875,9 @@ bool plan_heuristic::unwind_path() {
 
 
 
-  void plan_heuristic::getSuggestions() {
+  bool plan_heuristic::getSuggestions() {
     if (!m_suggestions.empty()){
-      return;
+      return true;
     }
     DREAL_LOG_INFO << "plan_heuristic::getSuggestions()";
     displayTrail();
@@ -895,7 +895,7 @@ bool plan_heuristic::unwind_path() {
   // bool suggest_defaults = true;
 
    if(!m_suggestions.empty() && suggestion_consistent) {
-     return;
+     return true;
    } else if(!suggestion_consistent || backtracked) {
      path_possible = unwind_path();
    }
@@ -911,7 +911,7 @@ bool plan_heuristic::unwind_path() {
    }
 
    if (m_decision_stack.size() == 0)
-     return;
+     return false;
 
 
 

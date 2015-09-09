@@ -138,6 +138,7 @@ SMTConfig::initializeConfig( )
   nra_plan_domain              = "";
   nra_plan_problem             = "";
   nra_output_num_nodes         = false;
+  nra_icp_decisions            = 0;
 }
 
 void SMTConfig::parseConfig ( char * f )

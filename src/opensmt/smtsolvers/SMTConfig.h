@@ -211,7 +211,8 @@ struct SMTConfig
   bool         nra_ODE_forward_only;          // only use ODE forward pruning (not use ODE backward)
   bool         nra_ODE_parallel;              // solve ODE in parallel or not
   bool         nra_output_num_nodes;          // output number of SAT and ICP nodes to stdout
-
+  int          nra_icp_decisions;
+  
   void inc_icp_decisions() { nra_icp_decisions++; }
   int  icp_decisions() { return nra_icp_decisions; }
 

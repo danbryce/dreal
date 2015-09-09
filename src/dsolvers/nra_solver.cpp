@@ -108,67 +108,6 @@ void nra_solver::popBacktrackPoint () {
     m_env.pop();
 }
 
-void nra_solver::handle_sat_case(box const & b) const {
-    // SAT
-    // --proof option
-    if (config.nra_proof) {
-        config.nra_proof_out.close();
-        config.nra_proof_out.open(config.nra_proof_out_name.c_str(), std::ofstream::out | std::ofstream::trunc);
-        display(config.nra_proof_out, b, !config.nra_readable_proof, true);
-    }
-    // --model option
-    if (config.nra_model && config.nra_multiple_soln == 1) {
-        // Only output here when --multiple_soln is not used
-        output_solution(b, config);
-    }
-#ifdef SUPPORT_ODE
-    // --visualize option
-    if (config.nra_json) {
-        json traces = {};
-        // Need to run ODE pruning operator once again to generate a trace
-        for (constraint * const ctr : m_stack) {
-            if (ctr->get_type() == constraint_type::ODE) {
-                contractor_capd_fwd_full fwd_full(b, dynamic_cast<ode_constraint *>(ctr), config.nra_ODE_taylor_order, config.nra_ODE_grid_size);
-                json trace = fwd_full.generate_trace(b, config);
-                traces.push_back(trace);
-            }
-        }
-        json vis_json;
-        vis_json["traces"] = traces;
-        config.nra_json_out << vis_json.dump() << endl;;
-    }
-#endif
-    // For API call
-    b.assign_to_enode();
-    return;
-}
-
-void nra_solver::handle_deduction() {
-    for (Enode * const l : m_lits) {
-        if (l->getPolarity() == l_Undef && !l->isDeduced()) {
-            auto it = m_ctr_map.find(make_pair(l, true));
-            if (it != m_ctr_map.end()) {
-                constraint * ctr = it->second;
-                nonlinear_constraint const * const nl_ctr = dynamic_cast<nonlinear_constraint *>(ctr);
-                if (nl_ctr) {
-                    pair<lbool, ibex::Interval> p = nl_ctr->eval(m_box);
-                    if (p.first == l_False) {
-                        // We know that this literal has to be false;
-                        l->setDeduced(l_False, id);
-                        deductions.push_back(l);
-                        DREAL_LOG_INFO << "Deduced: " << *nl_ctr << "\t" << p.first << "\t" << p.second;
-                    } else if (p.first == l_True) {
-                        // We know that this literal has to be true;
-                        l->setDeduced(l_True, id);
-                        deductions.push_back(l);
-                        DREAL_LOG_INFO << "Deduced: " << *nl_ctr << "\t" << p.first << "\t" << p.second;
-                    }
-                }
-            }
-        }
-    }
-}
-
 // Check for consistency.
 // If flag is set make sure you run a complete check
 bool nra_solver::check(bool complete) {

@@ -1,5 +1,4 @@
-SET(DREAL_SRCS ${DREAL_SRCS}
-  ${CMAKE_CURRENT_LIST_DIR}/heuristic.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/hybrid_heuristic.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/plan_heuristic.cpp
-  PARENT_SCOPE)
+add_library(opensmt_heuristics heuristic.cpp hybrid_heuristic.cpp plan_heuristic.cpp)
+#target_link_libraries(opensmt_heuristics)
+#add_dependencies(opensmt_smtsolvers util)
+#add_dependencies(opensmt_smtsolvers GFLAGS)
