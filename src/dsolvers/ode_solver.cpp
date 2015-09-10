@@ -1187,6 +1187,7 @@ ode_solver::ODE_result ode_solver::simple_ODE_forward(IVector const & X_0, IVect
             interval new_x_t = x_0 + dxdt(inv) * T;
             if (!intersection(new_x_t, x_t, x_t)) {
                 DREAL_LOG_INFO << "ode_solver::simple_ODE_forward: no intersection for X_T => UNSAT";
+		DREAL_LOG_INFO << new_x_t << " " << x_t;
                 return ODE_result::UNSAT;
             }
         } catch (exception& e) {

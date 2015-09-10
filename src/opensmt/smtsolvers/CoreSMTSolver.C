@@ -1796,13 +1796,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
         bool isSAT = false;
         if(config.nra_short_sat){
           //check if SAT, even if not all literals are assigned
-          isSAT = true;
-          for (int c = 0; c < nClauses(); c++) {
-            if (!satisfied(*clauses[c])) {
-              isSAT = false;
-              break;
-            }
-          }
+          isSAT = entailment();
 
           //Filter variables that don't need assignment
           filterUnassigned();
@@ -1814,11 +1808,6 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
             DREAL_LOG_DEBUG << "CoreSMTSolver::search() not SAT yet" << endl;
           }
 	  
-	  if(DREAL_LOG_DEBUG_IS_ON){
-	    DREAL_LOG_DEBUG << "Model is:";
-	    printCurrentAssignment(std::cout);
-	  }
-
           if(DREAL_LOG_DEBUG_IS_ON){
             DREAL_LOG_DEBUG << "Model is:";
             printCurrentAssignment(std::cout);
@@ -1826,27 +1815,19 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
         }
 
         if (next == lit_Undef){
-          if ((!config.nra_short_sat) || (!entailment())) {
-	    if( !isSAT ){       
-        	// New variable decision:
-        		DREAL_LOG_INFO << "Pick branch on a lit: " << endl;
-        		decisions++;
-        		next = pickBranchLit(polarity_mode, random_var_freq);
-	    }
-        	} else {
-	    if( !isSAT ){	      
-        	// New variable decision:
-        		DREAL_LOG_INFO << "Pick branch on a lit: " << endl;
-        		decisions++;
-        		next = pickBranchLit(polarity_mode, random_var_freq);
+          
+	    if( !isSAT ){
+	      // New variable decision:
+	      DREAL_LOG_INFO << "Pick branch on a lit: " << endl;
+	      decisions++;
+	      next = pickBranchLit(polarity_mode, random_var_freq);
 	    } else {
- 
-        		// SAT formula is satisfiable
-        		next = lit_Undef;
-        		DREAL_LOG_INFO << "Found Model after # decisions " << decisions << endl;
+	      // SAT formula is satisfiable
+	      next = lit_Undef;
+	      DREAL_LOG_INFO << "Found Model after # decisions " << decisions << endl;
 	    }
-        	}
-
+	  
+	  
 	  if ( next == lit_Error)
 	    {
 	      //	      return l_False;
@@ -1934,7 +1915,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
             assert( res == 1 );
 
             if(config.nra_short_sat){
-              if ( res == 1 ) return l_True;
+               return l_True;
             }
 
             // Otherwise we still have to make sure that
