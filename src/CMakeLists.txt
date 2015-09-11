@@ -291,19 +291,18 @@ ExternalProject_Add(GTEST
 set(EXTRA_LIBS ${EXTRA_LIBS} "gtest")
 
 ################################################################
-# External: json11 (Dropbox json11)
+# External: json
 ################################################################
-ExternalProject_Add(JSON11
+ExternalProject_Add(JSON
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external
-  GIT_REPOSITORY https://github.com/dreal-deps/json11.git
-  GIT_TAG origin/master
-  UPDATE_COMMAND ${GIT_EXECUTABLE} pull -s recursive -X theirs origin master
-  CONFIGURE_COMMAND cmake -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} "-DCMAKE_CXX_FLAGS=${EXTERNAL_CXX_FLAGS}" "-DCMAKE_EXE_LINKER_FLAGS=${EXTERNAL_LD_FLAGS}" -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR} ./
-  BUILD_COMMAND make -j
+  GIT_REPOSITORY https://github.com/dreal-deps/json.git
+  GIT_TAG master
+  UPDATE_COMMAND ${GIT_EXECUTABLE} fetch --all
+         COMMAND ${GIT_EXECUTABLE} reset --hard origin/master
+  CONFIGURE_COMMAND echo "nothing to configure"
+  BUILD_COMMAND echo "nothing to build"
   BUILD_IN_SOURCE 1
-  INSTALL_COMMAND make install
-)
-set(EXTRA_LIBS ${EXTRA_LIBS} "json11")
+  INSTALL_COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/include/json && cp -v src/json.hpp ${CMAKE_CURRENT_BINARY_DIR}/include/json/)
 
 ################################################################
 # External: set up include dir and libpath
@@ -410,7 +409,7 @@ add_subdirectory(tests/realpaver)
 add_subdirectory(tests/c_api)
 
 #dependencies
-add_dependencies(dsolvers JSON11)
+add_dependencies(dReal JSON)
 add_dependencies(dsolvers realpaver)
 add_dependencies(dsolvers CAPD4)
 add_dependencies(realpaver GFLAGS)
