@@ -22,6 +22,7 @@ along with OpenSMT. If not, see <http://www.gnu.org/licenses/>.
 
 #include <fstream>
 #include <iostream>
+#include <chrono>
 #include <sys/stat.h>
 #include "common/Global.h"
 #include "minisat/core/SolverTypes.h"
@@ -212,6 +213,14 @@ struct SMTConfig
   bool         nra_ODE_parallel;              // solve ODE in parallel or not
   bool         nra_output_num_nodes;          // output number of SAT and ICP nodes to stdout
   int          nra_icp_decisions;
+  int          nra_hybrid_nodes;
+  int          nra_num_hybrid_conflicts;
+  
+  std::chrono::duration<double> nra_heuristic_time;
+  std::chrono::duration<double> nra_instantiation_time;
+  std::chrono::duration<double> nra_sat_time;
+  std::chrono::duration<double> nra_icp_time;
+  
   
   void inc_icp_decisions() { nra_icp_decisions++; }
   int  icp_decisions() { return nra_icp_decisions; }

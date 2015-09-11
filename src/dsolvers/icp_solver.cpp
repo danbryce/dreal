@@ -635,6 +635,7 @@ rp_box icp_solver::compute_next() {
             rp_box b = m_boxes.get();
             int i = m_vselect->apply(b);
             DREAL_LOG_INFO << "Split Var: " << i;
+	    m_config.inc_icp_decisions();
             if (i >= 0 &&
                 ((m_config.nra_delta_test ?
                   !is_box_within_delta(b) :

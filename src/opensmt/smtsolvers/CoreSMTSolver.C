@@ -40,6 +40,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "tsolvers/THandler.h"
 #include "minisat/mtl/Sort.h"
 #include <cmath>
+#include <chrono>
 #include "util/logging.h"
 #include "heuristics/heuristic.h"
 #include "heuristics/plan_heuristic.h"
@@ -1654,7 +1655,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
   starts++;
 
 //  bool first = true;
-
+ 
 #ifdef STATISTICS
   const double start = cpuTime( );
 #endif
@@ -1665,6 +1666,9 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
   while ( res == 2 )
     res = checkTheory( false );
   assert( res == 1 );
+  std::chrono::high_resolution_clock::time_point
+    start_time = std::chrono::high_resolution_clock::now();
+
 #ifdef STATISTICS
   tsolvers_time += cpuTime( ) - start;
 #endif
@@ -1674,7 +1678,7 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
   boolVarDecActivity( );
 
   for (;;)
-  {
+  {   
     // Added line
     if ( opensmt::stop ) return l_Undef;
     //DREAL_LOG_DEBUG << "CoreSMTSolver::propagate()" << endl;
@@ -1750,8 +1754,12 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 #ifdef STATISTICS
           const double start = cpuTime( );
 #endif
+	  config.nra_sat_time += std::chrono::high_resolution_clock::now() - start_time;
+
           int res = checkTheory( false );
-          DREAL_LOG_DEBUG << "CoreSMTSolver::search() checkTheory1 = " << res << endl;
+	  start_time = std::chrono::high_resolution_clock::now();
+	  
+	  DREAL_LOG_DEBUG << "CoreSMTSolver::search() checkTheory1 = " << res << endl;
 #ifdef STATISTICS
           tsolvers_time += cpuTime( ) - start;
 #endif
@@ -1820,7 +1828,12 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 	      // New variable decision:
 	      DREAL_LOG_INFO << "Pick branch on a lit: " << endl;
 	      decisions++;
+
+	      config.nra_sat_time += std::chrono::high_resolution_clock::now() - start_time;
+
 	      next = pickBranchLit(polarity_mode, random_var_freq);
+
+	      start_time = std::chrono::high_resolution_clock::now();	      
 	    } else {
 	      // SAT formula is satisfiable
 	      next = lit_Undef;
@@ -1891,8 +1904,13 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 #ifdef STATISTICS
             const double start = cpuTime( );
 #endif
-            int res = checkTheory( true );
-            DREAL_LOG_DEBUG << "CoreSMTSolver::search() checkTheory2 = " << res << endl;
+	    config.nra_sat_time += std::chrono::high_resolution_clock::now() - start_time;
+
+	    int res = checkTheory( true );
+
+	    start_time = std::chrono::high_resolution_clock::now();
+
+	    DREAL_LOG_DEBUG << "CoreSMTSolver::search() checkTheory2 = " << res << endl;
 #ifdef STATISTICS
             tsolvers_time += cpuTime( ) - start;
 #endif
@@ -1950,6 +1968,8 @@ lbool CoreSMTSolver::search(int nof_conflicts, int nof_learnts)
 
 
   }
+
+  config.nra_sat_time += std::chrono::high_resolution_clock::now() - start_time;
 }
 
 double CoreSMTSolver::progressEstimate() const
@@ -2054,8 +2074,9 @@ lbool CoreSMTSolver::solve( const vec<Lit> & assumps
         next_printout *= restart_inc;
     }
 #endif
-
+ 
     status = search((int)nof_conflicts, (int)nof_learnts);
+ 
     nof_conflicts = restartNextLimit( nof_conflicts );
     cstop = cstop || ( max_conflicts != 0
                     && nLearnts() > (int)max_conflicts + (int)old_conflicts );

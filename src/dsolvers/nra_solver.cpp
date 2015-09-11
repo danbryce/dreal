@@ -118,6 +118,10 @@ bool nra_solver::check(bool complete) {
     DREAL_LOG_DEBUG << m_stack;
     DREAL_LOG_DEBUG << "nra_solver::check: explanation_stack = ";
     DREAL_LOG_DEBUG << m_explanation_stack;
+
+   std::chrono::high_resolution_clock::time_point
+      start_time = std::chrono::high_resolution_clock::now();
+    
     bool result = true;
     icp_solver solver(config, egraph, sstore, m_stack, m_env, complete);
     if (!complete) {
@@ -154,6 +158,11 @@ bool nra_solver::check(bool complete) {
 #endif
     DREAL_LOG_INFO << "============================";
     m_decisions += solver.nsplit();
+
+   std::chrono::high_resolution_clock::time_point
+      end_time = std::chrono::high_resolution_clock::now();
+    config.nra_icp_time += end_time - start_time;
+     
     return result;
 }
 

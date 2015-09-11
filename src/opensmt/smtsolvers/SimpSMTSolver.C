@@ -220,6 +220,10 @@ lbool SimpSMTSolver::solve( const vec< Lit > & assumps
   vec<Var> extra_frozen;
   bool     result = true;
 
+  std::chrono::high_resolution_clock::time_point
+    start_time = std::chrono::high_resolution_clock::now();
+
+  
   if ( config.sat_preprocess_theory == 0 )
     goto skip_theory_preproc;
 
@@ -319,7 +323,8 @@ skip_theory_preproc:
 #ifdef STATISTICS
   CoreSMTSolver::preproc_time = cpuTime( );
 #endif
-
+  config.nra_instantiation_time = std::chrono::high_resolution_clock::now() - start_time;
+  
   lbool lresult = l_Undef;
   if (result)
     lresult = CoreSMTSolver::solve(assumps, conflicts);

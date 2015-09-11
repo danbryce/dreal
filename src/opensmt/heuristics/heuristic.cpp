@@ -103,13 +103,13 @@ namespace dreal{
     }
 
     // if (m_config->nra_use_stat) {
-    //   std::chrono::high_resolution_clock::time_point
-    // 	end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point
+      end_time = std::chrono::high_resolution_clock::now();
     //   //DREAL_LOG_DEBUG << end_time << " " << start_time;
       
-    //    std::chrono::duration<double> elapsed_seconds =
-    //    	std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
-    //    m_config->nra_stat.increase_heuristic_time( elapsed_seconds );
+       std::chrono::duration<double> elapsed_seconds =
+	 std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
+       m_config->nra_heuristic_time +=  elapsed_seconds;
     //   DREAL_LOG_INFO << "heuristic::getSuggestion() used " << elapsed_seconds.count();
     // }
 

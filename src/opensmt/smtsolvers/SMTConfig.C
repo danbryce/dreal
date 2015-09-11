@@ -139,6 +139,12 @@ SMTConfig::initializeConfig( )
   nra_plan_problem             = "";
   nra_output_num_nodes         = false;
   nra_icp_decisions            = 0;
+  nra_heuristic_time           = std::chrono::duration<double>::zero();
+  nra_sat_time                 = std::chrono::duration<double>::zero();
+  nra_icp_time                 = std::chrono::duration<double>::zero();
+  nra_instantiation_time       = std::chrono::duration<double>::zero();
+  nra_hybrid_nodes             = 0;
+  nra_num_hybrid_conflicts     = 0;
 }
 
 void SMTConfig::parseConfig ( char * f )

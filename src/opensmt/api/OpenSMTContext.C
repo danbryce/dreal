@@ -808,7 +808,14 @@ void OpenSMTContext::PrintResult( const lbool & result, const lbool & config_sta
       for( auto t : getEgraphP()->getTSolvers()){
         dreal::nra_solver* nra = dynamic_cast<dreal::nra_solver*>(t);
         if(nra && config.nra_output_num_nodes){
-          out << "nodes: " << solver.decisions  << " " << config.icp_decisions()
+          out << config.nra_hybrid_nodes
+	      << " " << config.nra_num_hybrid_conflicts
+	      << " " << solver.decisions
+	      << " " << config.icp_decisions()
+	      << " " << config.nra_instantiation_time.count()
+	      << " " << config.nra_heuristic_time.count()
+	      << " " << config.nra_sat_time.count()
+	      << " " << config.nra_icp_time.count()
               << endl;
         }
         if(nra && config.nra_model){
