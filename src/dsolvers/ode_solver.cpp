@@ -604,7 +604,7 @@ ode_solver::ODE_result ode_solver::solve_forward(rp_box b) {
     update(b);
 
     bool prune_params_result = prune_params();
-    if (!prune_params_result) {
+    if (!prune_params_result) {     
         return ODE_result::UNSAT;
     }
 

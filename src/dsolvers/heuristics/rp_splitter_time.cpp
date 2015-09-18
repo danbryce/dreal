@@ -66,29 +66,41 @@ void rp_splitter_time::apply(rp_box_set& bs, int var) {
   this->observe(b1, var);
   rp_box b2 = bs.insert(b1);
 
-  if (quick_split_vars[&b1] == NULL){
-    quick_split_vars[&b1] = new std::set<int>();
-  }
-  quick_split_vars[&b2] = new std::set<int>(*quick_split_vars[&b1]);
+  // if (quick_split_vars[&b1] == NULL){
+  //   quick_split_vars[&b1] = new std::set<int>();
+  // }
+  // quick_split_vars[&b2] = new std::set<int>(*quick_split_vars[&b1]);
+  rp_interval &vi = rp_box_elem(b1, var);
 
-  if (is_time_variable(var) && !did_quick_split(&b1, var)){
+  // if(is_time_variable(var)){
+  //   std::cout << "might split time" << std::endl;
+  //   std::cout << "[" << rp_binf(vi) << ", " << rp_bsup(vi) << "] width = " << abs(rp_binf(vi) - rp_bsup(vi)) << std::endl;
+  //   std::cout << "candidate? " << (rp_binf(vi) == 0.0) << std::endl;
+    
+  // }
+  
+  if (is_time_variable(var) //&& !did_quick_split(&b1, var)
+      && rp_binf(vi) == 0.0 && abs(rp_binf(vi) - rp_bsup(vi)) > precision
+      ){
     if (this->real_hole(rp_box_elem(b1, var),
                         rp_variable_domain(rp_problem_var(*_problem, var)),
                         i1, i2)){
       rp_interval_copy(rp_box_elem(b1, var), i1);
       rp_interval_copy(rp_box_elem(b2, var), i2);
     } else {
-      // std::cout << "TIME SPLIT" << std::endl;
-      rp_interval &vi = rp_box_elem(b1, var);
+      
+      
       double split =  std::min(rp_binf(vi) + precision, rp_split_point(rp_binf(vi), rp_bsup(vi), 1000, 1));
 
+      //td::cout << "TIME SPLIT at " << split << std::endl;
+      
       // Real variable: [a,b] --> [center,b] and [a,center]
       rp_binf(rp_box_elem(b1, var)) =
         rp_bsup(rp_box_elem(b2, var)) =
         split;
 
-      quick_split_vars[&b1]->insert(var);
-      quick_split_vars[&b2]->insert(var);
+      // quick_split_vars[&b1]->insert(var);
+      // quick_split_vars[&b2]->insert(var);
         // rp_interval_midpoint(rp_box_elem(b1,var));
     }
   } else if (rp_variable_integer(rp_problem_var(*_problem, var))){
@@ -115,6 +127,7 @@ void rp_splitter_time::apply(rp_box_set& bs, int var) {
           rp_interval_midpoint(rp_box_elem(b1, var));
     }
   }
+  //std::cout << "did split" << std::endl;
 }
 
 rp_splitter_time::rp_splitter_time(const rp_splitter_time& ds): rp_splitter(ds)

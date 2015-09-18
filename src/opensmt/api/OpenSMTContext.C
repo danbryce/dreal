@@ -816,6 +816,7 @@ void OpenSMTContext::PrintResult( const lbool & result, const lbool & config_sta
 	      << " " << config.nra_heuristic_time.count()
 	      << " " << config.nra_sat_time.count()
 	      << " " << config.nra_icp_time.count()
+	      << " " << config.nra_capd_time.count()
               << endl;
         }
         if(nra && config.nra_model){

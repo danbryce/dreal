@@ -327,8 +327,13 @@ rp_problem icp_solver::create_rp_problem() {
 
 #ifdef ODE_ENABLED
 void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver::ODE_result & result) {
+      std::chrono::high_resolution_clock::time_point
+      start_time = std::chrono::high_resolution_clock::now();
+   
+
     // Simple ODE
     result = odeSolver->simple_ODE(m_boxes.get(), forward);
+    m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
 
     if (result == ode_solver::ODE_result::UNSAT)
         return;
@@ -336,11 +341,13 @@ void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver:
         result = ode_solver::ODE_result::UNSAT;
         return;
     }
-
+    start_time = std::chrono::high_resolution_clock::now();
     if (forward) {
         // First Try (Forward).
         result = odeSolver->solve_forward(m_boxes.get());
         DREAL_LOG_DEBUG << "callODESolver: solve_forward result = " << result;
+	m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
+	start_time = std::chrono::high_resolution_clock::now();
         if (result == ode_solver::ODE_result::UNSAT)
             return;
         if (!m_propag.apply(m_boxes.get())) {
@@ -350,6 +357,8 @@ void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver:
         // Second Try (Backward).
         result = odeSolver->solve_backward(m_boxes.get());
         DREAL_LOG_DEBUG << "callODESolver: solve_backward result = " << result;
+	m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
+	start_time = std::chrono::high_resolution_clock::now();
         if (result == ode_solver::ODE_result::UNSAT)
             return;
         if (!m_propag.apply(m_boxes.get())) {
@@ -360,6 +369,8 @@ void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver:
         // First Try (Backward).
         result = odeSolver->solve_backward(m_boxes.get());
         DREAL_LOG_DEBUG << "callODESolver: solve_backward result = " << result;
+	m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
+	start_time = std::chrono::high_resolution_clock::now();
         if (result == ode_solver::ODE_result::UNSAT)
             return;
         if (!m_propag.apply(m_boxes.get())) {
@@ -369,6 +380,8 @@ void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver:
         // Second Try (Forward).
         result = odeSolver->solve_forward(m_boxes.get());
         DREAL_LOG_DEBUG << "callODESolver: solve_forward result = " << result;
+	m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
+	start_time = std::chrono::high_resolution_clock::now();
         if (result == ode_solver::ODE_result::UNSAT)
             return;
         if (!m_propag.apply(m_boxes.get())) {
@@ -376,6 +389,8 @@ void icp_solver::callODESolver(ode_solver * odeSolver, bool forward, ode_solver:
             return;
         }
     }
+    m_config.nra_capd_time += std::chrono::high_resolution_clock::now() - start_time;
+    start_time = std::chrono::high_resolution_clock::now();
     return;
 }
 #endif
@@ -635,6 +650,7 @@ rp_box icp_solver::compute_next() {
             rp_box b = m_boxes.get();
             int i = m_vselect->apply(b);
             DREAL_LOG_INFO << "Split Var: " << i;
+	    cout << "." << std::flush; //debug
 	    m_config.inc_icp_decisions();
             if (i >= 0 &&
                 ((m_config.nra_delta_test ?
@@ -655,6 +671,7 @@ rp_box icp_solver::compute_next() {
                 //                cout << rp_variable_name(rp_problem_var(m_problem, i)) << endl;
 
             } else {
+	      cout << std::endl; //debug
                 return(b);
             }
         } else {
@@ -665,6 +682,7 @@ rp_box icp_solver::compute_next() {
             m_boxes.remove();
         }
     }
+    cout << std::endl; //debug
     return nullptr;
 }
 

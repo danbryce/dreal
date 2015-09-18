@@ -220,6 +220,7 @@ struct SMTConfig
   std::chrono::duration<double> nra_instantiation_time;
   std::chrono::duration<double> nra_sat_time;
   std::chrono::duration<double> nra_icp_time;
+  std::chrono::duration<double> nra_capd_time;
   
   
   void inc_icp_decisions() { nra_icp_decisions++; }

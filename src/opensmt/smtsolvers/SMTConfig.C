@@ -143,6 +143,7 @@ SMTConfig::initializeConfig( )
   nra_sat_time                 = std::chrono::duration<double>::zero();
   nra_icp_time                 = std::chrono::duration<double>::zero();
   nra_instantiation_time       = std::chrono::duration<double>::zero();
+  nra_capd_time       = std::chrono::duration<double>::zero();
   nra_hybrid_nodes             = 0;
   nra_num_hybrid_conflicts     = 0;
 }
