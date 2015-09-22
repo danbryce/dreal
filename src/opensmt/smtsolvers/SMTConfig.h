@@ -215,6 +215,7 @@ struct SMTConfig
   int          nra_icp_decisions;
   int          nra_hybrid_nodes;
   int          nra_num_hybrid_conflicts;
+  bool         nra_heuristic_forward;
   
   std::chrono::duration<double> nra_heuristic_time;
   std::chrono::duration<double> nra_instantiation_time;

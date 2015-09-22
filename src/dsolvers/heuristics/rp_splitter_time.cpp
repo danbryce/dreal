@@ -91,7 +91,7 @@ void rp_splitter_time::apply(rp_box_set& bs, int var) {
       
       
       double split =  std::min(rp_binf(vi) + precision, rp_split_point(rp_binf(vi), rp_bsup(vi), 1000, 1));
-
+      std::cout << " * " << std::flush;
       //td::cout << "TIME SPLIT at " << split << std::endl;
       
       // Real variable: [a,b] --> [center,b] and [a,center]

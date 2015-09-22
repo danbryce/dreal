@@ -97,8 +97,9 @@ public:
     map<string, int> label_to_indices;
     map<int, string> label_from_indices;
     vector<vector<vector<labeled_transition*>*>*> predecessors;
+    vector<vector<vector<labeled_transition*>*>*> successors;
     vector<vector< double >*>  m_cost;
-    vector<int> m_init_mode;
+    vector<vector<labeled_transition*>*> m_init_mode;
     vector<vector<labeled_transition*>*> m_goal_modes;
     vector<pair<int, vector<labeled_transition*>*>*> m_decision_stack;
     int m_depth;

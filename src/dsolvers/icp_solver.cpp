@@ -463,11 +463,12 @@ int icp_solver::get_var_split_delta(rp_box b) {
         l->print_infix(buf, l->getPolarity());
         string constraint_str = buf.str();
         if (constraint_str.compare("0 = 0") != 0) {
-          DREAL_LOG_INFO << "icp_solver::get_var_split_delta: Considering constraint" << constraint_str;
             rp_constraint const c = rp_problem_ctr(m_problem, i);
             double const width =  constraint_width(&c, b);
             double const residual = width - rp_constraint_delta(c);
-            if (residual > max_width) {
+	    DREAL_LOG_INFO << "icp_solver::get_var_split_delta: Considering constraint" << constraint_str << " residual = " << residual;
+
+            if (residual > max_width || max_constraint == -1) {
                 max_width = residual;
                 max_constraint = i;
                 l->print_infix(buf, l->getPolarity());
@@ -483,7 +484,7 @@ int icp_solver::get_var_split_delta(rp_box b) {
         for (i = 0; i < rp_constraint_arity(c); i++){
             int const var = rp_constraint_var(c, i);
             double const width = rp_interval_width(rp_box_elem(b, var));
-            if (width > max_width) {
+            if (width > max_width || max_var == -1) {
                 max_width = width;
                 max_var = var;
             }
@@ -645,12 +646,13 @@ bool icp_solver::is_box_within_delta(rp_box b) {
 
 rp_box icp_solver::compute_next() {
     while (!m_boxes.empty()) {
+      cout << "." << std::flush;
         if (prop_with_ODE()) { // sean: here it is! propagation before split!!!
             // SAT => Split
             rp_box b = m_boxes.get();
             int i = m_vselect->apply(b);
             DREAL_LOG_INFO << "Split Var: " << i;
-	    cout << "." << std::flush; //debug
+	    cout << rp_variable_name(rp_problem_var(m_problem, i)) << std::flush; //debug
 	    m_config.inc_icp_decisions();
             if (i >= 0 &&
                 ((m_config.nra_delta_test ?
@@ -671,7 +673,7 @@ rp_box icp_solver::compute_next() {
                 //                cout << rp_variable_name(rp_problem_var(m_problem, i)) << endl;
 
             } else {
-	      cout << std::endl; //debug
+	      //cout << std::endl; //debug
                 return(b);
             }
         } else {
@@ -682,7 +684,7 @@ rp_box icp_solver::compute_next() {
             m_boxes.remove();
         }
     }
-    cout << std::endl; //debug
+    //cout << std::endl; //debug
     return nullptr;
 }
 

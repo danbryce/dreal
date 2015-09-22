@@ -146,6 +146,7 @@ SMTConfig::initializeConfig( )
   nra_capd_time       = std::chrono::duration<double>::zero();
   nra_hybrid_nodes             = 0;
   nra_num_hybrid_conflicts     = 0;
+  nra_heuristic_forward        = true;
 }
 
 void SMTConfig::parseConfig ( char * f )
