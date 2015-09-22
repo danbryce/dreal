@@ -417,6 +417,7 @@ add_dependencies(realpaver CAPD4)
 add_dependencies(realpaver FILIBXX)
 add_dependencies(realpaver util)
 add_dependencies(opensmt_heuristics JSON)
+add_dependencies(opensmt_heuristics GFLAGS)
 
 if(WITH_COLIN)
 add_dependencies(dReal colin_copy)
