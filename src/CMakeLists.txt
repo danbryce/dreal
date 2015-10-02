@@ -1,4 +1,4 @@
-make_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.7)
 project(DREAL C CXX)
 set(DREAL_VERSION_MAJOR 2)
 set(DREAL_VERSION_MINOR 15)
@@ -418,7 +418,7 @@ add_dependencies(realpaver FILIBXX)
 add_dependencies(realpaver util)
 add_dependencies(opensmt_heuristics JSON)
 add_dependencies(opensmt_heuristics GFLAGS)
-add_dependencies(GLOG GFLAGS)
+
 
 if(WITH_COLIN)
 add_dependencies(dReal colin_copy)
