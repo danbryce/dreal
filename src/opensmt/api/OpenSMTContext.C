@@ -605,6 +605,7 @@ void OpenSMTContext::DefineODE( char const * name, vector<pair<string, Enode *> 
     unordered_map<string, Enode *> flow;
     for(auto const & name_odes : *odes) {
         flow[name_odes->first] = name_odes->second;
+	DREAL_LOG_DEBUG << "flow[" << name_odes->first << "] = " << name_odes->second;
         delete name_odes;
     }
     string const sname (name);

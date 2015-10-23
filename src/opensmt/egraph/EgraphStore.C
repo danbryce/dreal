@@ -947,6 +947,8 @@ Enode * Egraph::mkPlus( Enode * args )
   assert( args );
   assert( args->getArity( ) >= 1 );
 
+  DREAL_LOG_DEBUG << "mkPlus: " << args;
+  
   if ( args->getArity( ) == 1 )
     return args->getCar( );
 
@@ -957,9 +959,9 @@ Enode * Egraph::mkPlus( Enode * args )
   // Simplify constants
   //
   if (x->isConstant() && x->getValue() == 0.0) {
-      return y;
+	return mkPlus(args->getCdr( ));
   } else if (y->isConstant() && y->getValue() == 0.0) {
-      return x;
+    return mkPlus(cons(x, args->getCdr( )->getCdr()));
   }
   
   if ( x->isConstant( ) && y->isConstant( ) && args->getArity( ) == 2 )
@@ -967,7 +969,7 @@ Enode * Egraph::mkPlus( Enode * args )
     const double xval = x->getValue( );
     const double yval = y->getValue( );
     double sum = xval + yval;
-    res = mkNum( sum );
+    res = mkPlus( cons(mkNum( sum ), args->getCdr( )->getCdr()));
   }
   else
   {

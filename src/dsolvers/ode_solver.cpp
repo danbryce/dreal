@@ -104,6 +104,9 @@ ode_solver::ode_solver(SMTConfig& c,
     unordered_map<string, Enode *> & flow_map = m_egraph.flow_maps[string("flow_") + flow_step  + to_string(m_mode)];
     Enode * var_list = l_int->getCdr()->getCdr()->getCdr()->getCdr();
 
+    for (auto const & single_equation : flow_map) {
+      DREAL_LOG_DEBUG << "flow_map[" << single_equation.first << "] = " << single_equation.second;
+    }
 
     // Collect _0, _t variables from variable list in integral literal
     while (!var_list->isEnil()) {
@@ -128,6 +131,7 @@ ode_solver::ode_solver(SMTConfig& c,
         rhs->print_infix(ss, true, name_postfix);
         Enode * const _0_var = var_list->getCar();
         Enode * const _t_var = var_list->getCdr()->getCar();
+	DREAL_LOG_DEBUG << name_prefix << " rhs = " << rhs;
         if (rhs->isConstant() && rhs->getValue() == 0.0) {
             // If RHS of ODE == 0.0, we treat it as a parameter in CAPD
             m_0_pars.push_back(_0_var);
